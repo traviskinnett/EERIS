@@ -1,0 +1,68 @@
+name: Node.js CI + Branch Policy
+
+on:
+  # Run CI on push to master
+  push:
+    branches: [ "master" ]
+  # Run CI + branch policy check on PRs into master or develop
+  pull_request:
+    branches: [ "master", "develop" ]
+
+jobs:
+  check-branch-names:
+    # Only run this job when event == pull_request
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce naming policy
+        run: |
+          # Source (head) branch and Target (base) branch
+          SRC_BRANCH="${{ github.event.pull_request.head.ref }}"
+          TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+
+          echo "Source branch: $SRC_BRANCH"
+          echo "Target branch: $TARGET_BRANCH"
+
+          # 1) PR into develop => must start with "feature/"
+          if [ "$TARGET_BRANCH" = "develop" ]; then
+            if [[ "$SRC_BRANCH" != feature/* ]]; then
+              echo "Error: Branches merging into 'develop' must start with 'feature/'. Please double check branch name."
+              exit 1
+            fi
+          # 2) PR into master => must be "develop"
+          elif [ "$TARGET_BRANCH" = "master" ]; then
+            if [ "$SRC_BRANCH" != "develop" ]; then
+              echo "Error: Only 'develop' can be merged into 'master'. Ensure the develop branch is "
+              exit 1
+            fi
+          fi
+
+          echo "Branch name check passed."
+
+  build-and-test:
+    # This job depends on the branch check passing first (on pull_request)
+    # If we're pushing directly to master (push event), there's no naming check
+    needs: [ check-branch-names ]
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (if applicable)
+        run: npm run build --if-present
+
+      - name: Test
+        run: npm test
