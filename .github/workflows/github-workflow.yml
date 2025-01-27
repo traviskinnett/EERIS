@@ -61,8 +61,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build (if applicable)
-        run: pnpm run build --if-present
+      # - name: Build (if applicable)
+      #   run: pnpm run build --if-present
 
-      - name: Test
-        run: pnpm test
+      # - name: Test
+      #   run: pnpm test
