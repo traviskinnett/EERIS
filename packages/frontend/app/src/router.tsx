@@ -10,6 +10,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    //TODO add error element for 404 page
     children: [
       {
         path: "dashboard",
