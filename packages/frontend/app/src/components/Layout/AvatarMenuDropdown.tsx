@@ -1,17 +1,46 @@
-import { DownOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar } from "antd";
+import { DownOutlined, UserOutlined, LogoutOutlined, IdcardOutlined } from "@ant-design/icons";
+import { Avatar, Dropdown, MenuProps, Space } from "antd";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useNavigate } from "react-router-dom";
 
 export const AvatarMenuDropdown = () => {
-  return (
-    <div className="flex items-center pr-6 gap-x-3">
-      {
-        //used gap instead of space-x-3 because the Avatar component has a margin 0 property by default
-        //TODO add popover dropdown menu with settings button
-      }
+  const { user, logout } = useAuth0();
+  const navigate = useNavigate();
 
-      <Avatar icon={<UserOutlined />} />
-      <div>Travis Kinnett</div>
-      <DownOutlined />
-    </div>
+  const name = user?.name || user?.email || "User";
+  const avatarUrl = user?.picture;
+
+  const items: MenuProps["items"] = [
+    {
+      key: "profile",
+      icon: <IdcardOutlined />,
+      label: "Profile",
+      onClick: () => navigate("/profile"),
+    },
+    {
+      key: "logout",
+      icon: <LogoutOutlined />,
+      label: "Logout",
+      onClick: () =>
+        logout({
+          logoutParams: { returnTo: window.location.origin },
+        }),
+    },
+  ];
+
+  return (
+    <Dropdown menu={{ items }} placement="bottomRight">
+      <div className="flex items-center pr-6 gap-x-3 cursor-pointer">
+        <Space>
+          {avatarUrl ? (
+            <Avatar src={avatarUrl} alt={name} />
+          ) : (
+            <Avatar icon={<UserOutlined />} />
+          )}
+          <span>{name}</span>
+          <DownOutlined />
+        </Space>
+      </div>
+    </Dropdown>
   );
 };
