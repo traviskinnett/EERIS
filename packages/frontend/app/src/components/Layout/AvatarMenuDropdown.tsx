@@ -29,18 +29,20 @@ export const AvatarMenuDropdown = () => {
   ];
 
   return (
-    <Dropdown menu={{ items }} placement="bottomRight">
-      <div className="flex items-center pr-6 gap-x-3 cursor-pointer">
-        <Space>
-          {avatarUrl ? (
-            <Avatar src={avatarUrl} alt={name} />
-          ) : (
-            <Avatar icon={<UserOutlined />} />
-          )}
-          <span>{name}</span>
-          <DownOutlined />
-        </Space>
-      </div>
+    <Dropdown menu={{ items }} placement="bottomRight" trigger={["click"]}>
+      <a onClick={(e) => e.preventDefault()}>
+        <div className="flex items-center pr-6 gap-x-3 cursor-pointer text-gray-600 hover:text-gray-900">
+          <Space>
+            {avatarUrl ? (
+              <Avatar src={avatarUrl} alt={name} />
+            ) : (
+              <Avatar icon={<UserOutlined />} />
+            )}
+            <span>{name}</span>
+            <DownOutlined />
+          </Space>
+        </div>
+      </a>
     </Dropdown>
   );
 };

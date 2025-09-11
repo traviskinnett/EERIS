@@ -43,11 +43,7 @@ export const ProfilePage = () => {
         <Title level={4}>{user?.name || "No Name"}</Title>
         <Text>Email: {user?.email || "N/A"}</Text>
         <br />
-        <Text>UUID: {user?.sub}</Text>
-        <br />
         <Text>Role: {role || "N/A"}</Text>
-        <br />
-        <Text>Department: {department || "N/A"}</Text>
       </Card>
     </div>
   );

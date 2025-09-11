@@ -7,12 +7,14 @@ import { HeaderApp } from "./HeaderApp";
 import "./Homepage.css";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export const HomePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated } = useAuth0();
+  const [role, setRole] = useState<string | null>(null);
 
   // Send user info to backend on first login
   useEffect(() => {
@@ -24,10 +26,26 @@ export const HomePage = () => {
           uuid: user.sub,
           email: user.email,
           name: user.name,
+          role: user["https://eeris.local/role"] || "Employee",
         }),
-      }).catch((err) => console.error("❌ Failed to sync user:", err));
+      }).catch((err) => console.error("Failed to sync user:", err));
     }
   }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      if (!isAuthenticated || !user) return;
+
+      try {
+        const response = await axios.get(`/api/user/${user.sub}`);
+        setRole(response.data.role);
+      } catch (err) {
+        console.error("Failed to load role info:", err);
+      }
+    };
+
+    fetchRole();
+  }, [user, isAuthenticated]);
 
   // Get current route to set selected menu key
   const getSelectedKey = (pathname: string) => {
@@ -58,6 +76,8 @@ export const HomePage = () => {
           key: "expense management",
           label: "Management",
           onClick: () => navigate("/management"),
+          //@ts-ignore
+          hidden: role === "Employee",
         },
       ],
     },
@@ -79,7 +99,8 @@ export const HomePage = () => {
             <div className="text-center pb-2">Software Engineering 2025</div>
           </div>
         </Sider>
-        <Content>
+
+        <Content className="layout-content">
           <Outlet />
         </Content>
       </Layout>

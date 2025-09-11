@@ -1,4 +1,8 @@
-import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from "react-router-dom";
 import ReactDOM from "react-dom/client";
 import React from "react";
 import { Auth0Provider } from "@auth0/auth0-react";
@@ -7,11 +11,12 @@ import App from "./App";
 import { HomePage } from "./components/Layout/Homepage";
 import { Dashboard } from "./components/Dashboard/Dashboard";
 import { ExpensesOverview } from "./components/Expenses/ExpensesOverview";
-import { ExpensesManagement } from "./components/Expenses/ExpensesManagement";
+
 import { ProfilePage } from "./components/Profile/ProfilePage";
 import { PrivateRoute } from "./components/Auth/PrivateRoute";
 
 import "./index.css";
+import { ExpensesManagement } from "./components/Expenses/ExpensesManagement";
 
 // Create router
 const router = createBrowserRouter([
@@ -77,9 +82,10 @@ root.render(
         redirect_uri: window.location.origin,
       }}
       onRedirectCallback={(appState) => {
-        // 👇 Only change path if coming back from Auth0 login
+        // Only change path if coming back from Auth0 login
         const url = new URL(window.location.href);
-        const isReturningFromAuth0 = url.searchParams.has("code") && url.searchParams.has("state");
+        const isReturningFromAuth0 =
+          url.searchParams.has("code") && url.searchParams.has("state");
 
         if (isReturningFromAuth0 && appState?.returnTo) {
           window.history.replaceState({}, document.title, appState.returnTo);
